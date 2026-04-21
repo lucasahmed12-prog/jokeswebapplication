@@ -1,0 +1,32 @@
+@model jokesWebApp.Models.Joke
+
+<h1>Create</h1>
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        @foreach (var modelState in ViewData.ModelState.Values)
+        {
+            @foreach (var error in modelState.Errors)
+            {
+                <p>@error.ErrorMessage</p>
+            }
+        }
+    </div>
+}
+
+<form asp-action="Create" method="post">
+    <div>
+        <label asp-for="JokeQuestion"></label>
+        <input asp-for="JokeQuestion" />
+        <span asp-validation-for="JokeQuestion"></span>
+    </div>
+
+    <div>
+        <label asp-for="JokeAnswer"></label>
+        <input asp-for="JokeAnswer" />
+        <span asp-validation-for="JokeAnswer"></span>
+    </div>
+
+    <button type="submit">Save</button>
+</form>

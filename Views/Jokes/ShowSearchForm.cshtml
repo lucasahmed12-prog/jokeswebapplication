@@ -1,0 +1,10 @@
+<h1>Search Jokes</h1>
+
+<p>Search for jokes by question or answer:</p>
+
+<form asp-action="ShowSearchResults" method="get">
+    <input type="text" name="searchPhrase" placeholder="Enter search term..." />
+    <button type="submit">Search</button>
+</form>
+
+<p><a asp-action="Index">Back to Jokes</a></p>

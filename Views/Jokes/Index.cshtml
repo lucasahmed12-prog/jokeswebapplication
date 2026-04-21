@@ -1,0 +1,47 @@
+@model IEnumerable<jokesWebApp.Models.Joke>
+
+@using System.Security.Claims
+
+<h1>My Jokes</h1>
+
+<a asp-action="Create">Create New Joke</a>
+<a asp-action="ShowSearchForm">Search My Jokes</a>
+
+@if (!Model.Any())
+{
+    <p><em>You haven't created any jokes yet. <a asp-action="Create">Create your first joke!</a></em></p>
+}
+else
+{
+<table border="1" cellpadding="10" cellspacing="0">
+    <tr>
+        <th>Question</th>
+        <th>Answer</th>
+        <th>Likes</th>
+        <th>Actions</th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var userHasLiked = item.Likes?.Any(l => l.UserId == currentUserId) ?? false;
+
+        <tr>
+            <td>@item.JokeQuestion</td>
+            <td>@item.JokeAnswer</td>
+            <td>
+                <form asp-action="Like" asp-route-id="@item.Id" method="post" style="display:inline;">
+                    <button type="submit" class="btn-link" style="background:none; border:none; font-size:20px; cursor:pointer; padding:0 5px;">
+                        @(userHasLiked ? "👎" : "👍")
+                    </button>
+                </form>
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+    }
+</table>
+}

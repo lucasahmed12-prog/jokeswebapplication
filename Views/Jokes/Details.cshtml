@@ -1,0 +1,91 @@
+@using System.Security.Claims;
+@model jokesWebApp.Models.Joke
+
+<h2>Joke Details</h2>
+
+<p><strong>Question:</strong> @Model.JokeQuestion</p>
+<p><strong>Answer:</strong> @Model.JokeAnswer</p>
+
+<hr />
+
+<h3>Comments (@Model.Comments.Count)</h3>
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Add a Comment</h5>
+            <form method="post" action="/jokes/comment/add">
+                <div class="mb-3">
+                    <textarea class="form-control" name="commentText" rows="3" placeholder="Write your comment..." required></textarea>
+                </div>
+                <input type="hidden" name="jokeId" value="@Model.Id" />
+                @Html.AntiForgeryToken()
+                <button type="submit" class="btn btn-primary">Add Comment</button>
+            </form>
+        </div>
+    </div>
+}
+
+@if (Model.Comments.Count == 0)
+{
+    <p class="text-muted">No comments yet. Be the first to comment!</p>
+}
+else
+{
+    @foreach (var comment in Model.Comments.OrderByDescending(c => c.CreatedAt))
+    {
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div style="flex-grow: 1;">
+                        <h6 class="card-subtitle mb-2 text-muted">
+                            <strong>@(((Dictionary<string, string>)ViewBag.CommentEmails)[comment.UserId])</strong> - @comment.CreatedAt.ToString("g")
+                        </h6>
+                        <p class="card-text" id="comment-text-@comment.Id">@comment.CommentText</p>
+                        
+                        <!-- Edit Form (Hidden by default) -->
+                        @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == comment.UserId)
+                        {
+                            <form method="post" action="/jokes/comment/edit/@comment.Id" id="edit-form-@comment.Id" style="display: none;" class="mt-2">
+                                <div class="mb-2">
+                                    <textarea class="form-control" name="commentText" rows="2" required>@comment.CommentText</textarea>
+                                </div>
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-success">Save</button>
+                                <button type="button" class="btn btn-sm btn-secondary" onclick="toggleEditForm(@comment.Id)">Cancel</button>
+                            </form>
+                        }
+                    </div>
+                    
+                    @if (User.FindFirstValue(ClaimTypes.NameIdentifier) == comment.UserId)
+                    {
+                        <div class="ms-2">
+                            <button type="button" class="btn btn-sm btn-warning" onclick="toggleEditForm(@comment.Id)" id="edit-btn-@comment.Id">Edit</button>
+                            <form method="post" action="/jokes/comment/delete/@comment.Id" style="display: inline;">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this comment?')">Delete</button>
+                            </form>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+}
+
+<script>
+function toggleEditForm(commentId) {
+    const editForm = document.getElementById('edit-form-' + commentId);
+    const commentText = document.getElementById('comment-text-' + commentId);
+    
+    if (editForm.style.display === 'none') {
+        editForm.style.display = 'block';
+        commentText.style.display = 'none';
+    } else {
+        editForm.style.display = 'none';
+        commentText.style.display = 'block';
+    }
+}
+</script>
+

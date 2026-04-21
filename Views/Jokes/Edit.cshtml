@@ -1,0 +1,21 @@
+@model jokesWebApp.Models.Joke
+
+<h2>Edit Joke</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+
+    <div>
+        <label asp-for="JokeQuestion"></label>
+        <input asp-for="JokeQuestion" />
+        <span asp-validation-for="JokeQuestion"></span>
+    </div>
+
+    <div>
+        <label asp-for="JokeAnswer"></label>
+        <input asp-for="JokeAnswer" />
+        <span asp-validation-for="JokeAnswer"></span>
+    </div>
+
+    <button type="submit">Update</button>
+</form>
